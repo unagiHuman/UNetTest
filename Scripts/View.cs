@@ -17,14 +17,20 @@ public class View : MonoBehaviour {
 	}
 
 	public void Init(){
-		ClientManager.singleton.Request("msg",CallBack);
+		var request = new RequestData();
+		request.name = "name";
+		request.x = 1;
+		ClientManager.singleton.Request(request,CallBack);
 	}
 
-	void CallBack(){
-		ClientManager.singleton.Request2("msg2",EndCallBack);
+	void CallBack(RequestBase data){
+		//Debug.Log("2");
+		Debug.Log(data);
+		ClientManager.singleton.Request(data,EndCallBack);
 	}
 
-	void EndCallBack(){
+	void EndCallBack(RequestBase data){
+		Debug.Log(data);
 		Debug.Log("end");
 	}
 

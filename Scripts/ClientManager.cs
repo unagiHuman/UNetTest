@@ -13,13 +13,16 @@ public class ClientManager : NetworkBehaviour {
 
 	Action	m_task;
 
-	Action m_callback;
+	Action<RequestBase> m_callback;
 
 	View m_view;
 
+	int m_count;
+
 	[ServerCallback]
 	void Start () {
-	
+		m_count = 0;
+		m_task = ServerTask;
 	}
 
 	public override void OnStartLocalPlayer ()
@@ -38,28 +41,36 @@ public class ClientManager : NetworkBehaviour {
 		}
 	}
 		
-	public void Request(string msg, Action callback){
+	public void Request(RequestBase data, Action<RequestBase> callback){
 		m_callback = callback;
-		CmdRequest(msg);
+		CmdRequest(data);
 	}
 
 	[Command]
-	void CmdRequest(string msg){
-		CreateData(msg);
+	void CmdRequest(RequestBase data){
+		CreateData(data);
 	}
 
 	[Server]
-	void CreateData(string msg){
-		RpcGetData(msg);
+	void CreateData(RequestBase data){
+		Debug.Log(m_count);
+		RpcGetData(data);
 	}
 
 	[ClientRpc]
-	void RpcGetData(string msg){
-		Debug.Log(msg);
-		m_callback();
+	void RpcGetData(RequestBase data){
+		Debug.Log("clientRPC");
+		Debug.Log(data);
+		m_callback(data);
 	}
 
 
+	[Server]
+	void ServerTask(){
+		m_count++;
+	}
+
+	/*
 	public void Request2(string msg, Action callback){
 		m_callback = callback;
 		CmdRequest2(msg);
@@ -82,6 +93,7 @@ public class ClientManager : NetworkBehaviour {
 		Debug.Log(msg);
 		m_callback();
 	}
+	*/
 
 
 }
