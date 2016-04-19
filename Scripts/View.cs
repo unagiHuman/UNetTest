@@ -20,13 +20,13 @@ public class View : MonoBehaviour {
 		var request = new RequestData();
 		request.name = "name";
 		request.x = 1;
-		ClientManager.singleton.Request(request,CallBack);
+		GameManager.singleton.Request(request,CallBack);
 	}
 
 	void CallBack(RequestBase data){
 		//Debug.Log("2");
 		Debug.Log(data);
-		ClientManager.singleton.Request(data,EndCallBack);
+		GameManager.singleton.Request(data,EndCallBack);
 	}
 
 	void EndCallBack(RequestBase data){

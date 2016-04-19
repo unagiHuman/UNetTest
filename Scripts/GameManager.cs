@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
-using System;
+using System.Collections.Generic;
 
-public class ClientManager : NetworkBehaviour {
+public class GameManager : NetworkBehaviour {
 
-	public static ClientManager singleton {
+	public static GameManager singleton {
 		get; set;
 	}
 
@@ -19,21 +20,37 @@ public class ClientManager : NetworkBehaviour {
 
 	int m_count;
 
-	[ServerCallback]
-	void Start () {
-		m_count = 0;
-		m_task = ServerTask;
+
+	void Awake(){
+		singleton = this;
 	}
 
-	public override void OnStartLocalPlayer ()
-	{
-		base.OnStartLocalPlayer ();
-		singleton = this;
+
+	[ServerCallback]
+	private void Start () {
+		m_count = 0;
+		//m_task = ServerTask;
+		StartCoroutine(CreateView());
+	}
+
+
+	IEnumerator CreateView(){
+		///ClientRpc使うには待つ必要があるみたい。理由は不明。
+		yield return new WaitForSeconds(2.0f);
+
+		RpcCreateView();
+		yield return null;
+	}
+		
+	[ClientRpc]
+	void RpcCreateView(){
+		Debug.Log("aa");
 		var obj = Instantiate(viewPrefab) as GameObject;
 		m_view = obj.GetComponent<View>();
 		m_view.Init();
 	}
-	
+
+
 	[ServerCallback]
 	void Update () {
 		if(m_task!=null){
@@ -69,31 +86,5 @@ public class ClientManager : NetworkBehaviour {
 	void ServerTask(){
 		m_count++;
 	}
-
-	/*
-	public void Request2(string msg, Action callback){
-		m_callback = callback;
-		CmdRequest2(msg);
-	}
-
-
-	[Command]
-	void CmdRequest2(string msg){
-		CreateData2(msg);
-	}
-
-	[Server]
-	void CreateData2(string msg){
-
-		RpcGetData2(msg);
-	}
-
-	[ClientRpc]
-	void RpcGetData2(string msg){
-		Debug.Log(msg);
-		m_callback();
-	}
-	*/
-
 
 }
